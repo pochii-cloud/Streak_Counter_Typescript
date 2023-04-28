@@ -1,44 +1,11 @@
-import StreakCounter from "./classes/streakCounter.js";
-import BestDoneTask from "./classes/bestDoneTask.js";
 import Days from "./classes/days.js";
 import Task from "./classes/task.js";
-
-
 
 // get the elements from the DOM
 let addBtn = document.querySelector("#add-btn")!;
 let modal = document.querySelector('#my-modal')! as HTMLDivElement;
 let modalContent = document.querySelector('.modal-content')! as HTMLDivElement;
 let taskContainer = document.querySelector('.task-container')! as HTMLDivElement;
-let bestBtn = document.querySelector('#best-btn')! as HTMLButtonElement;
-// let taskTemplateContainer:string = `<div class="container task-container"></div>`
-
-// create a new instance of the streakCounter class
-let streakCounter = new StreakCounter();
-
-// create a new instance of the bestDoneTask class and pass the streakCounter instance to it
-let bestDoneTask = new BestDoneTask(streakCounter);
-
-// add event listener to taskContainer
-taskContainer.addEventListener("click", (e) => {
-    
-    e.stopImmediatePropagation();
-    // check if the target is the delete button
-    let target = e.target as HTMLElement;
-    if (target.className == "task") {
-        showSingle(Number(target.id));
-    }
-    if (target.className == "delete-btn") {
-        deleteTask(Number(target.id));
-    }
-    if (target.tagName == "img") {
-        showSingle(Number(target.id));
-    }
-    
-    
-        
-})
-
 
 modalContent.addEventListener("click", (e) => {
     let target = e.target as HTMLElement;
@@ -181,46 +148,14 @@ addBtn.addEventListener("click", () => {
  * 
  * @param {number} id the id of the task to be deleted
  */
-const deleteTask = (id: number) => {
-    let task = streakCounter.tasks.find((task) => task.id == id);
-    let index = streakCounter.tasks.indexOf(task!);
-    streakCounter.tasks.splice(index,1);
-    renderTasks();
-    modal.style.display = "none";
+async function deleteTask  (id: number){
+    await fetch(`http://localhost:3000/cart/${id}`, {
+        method:'DELETE',
+        headers:{
+            "Content-Type": "application/json"
+        }
+    })
 } 
-
-/**
- * 
- * @param {number} id the id of the task to be displayed
- * returns the task with the id passed as a parameter
- */
-const showSingle = (id: number) => {
-    let task = streakCounter.tasks.find((task) => task.id == id);
-    modalContent.innerHTML = "";
-    modal.style.display = "flex";
-    let singleTaskTemplate = `
-    <span class="close">&times;</span>
-    <div class="task">
-        <img src="${task?.imageUrl}" alt="task">
-        <p class="date">${task?.date}</p>
-        <p class="days">Days: ${Days.create(task!).getDays()}</p>
-        <!-- task name -->
-        <p class="task-name">${task!.name}</p>
-        <div class="modal-btn">
-        <button id="modal-close-btn" onclick="let modal = document.querySelector('#my-modal');modal.style.display = 'none'">Close</button>
-            <button class="delete-btn" id="${task!.id}">Delete</button>
-        </div>
-    </div>`
-    
-    if (task){
-        modalContent.innerHTML = singleTaskTemplate;
-        closeModal();
-    }
-    else{
-        modalContent.innerHTML = "<p>Task not found</p>"
-    }
-
-}
 
 //  function to render all the tasks in the streakCounter instance to the DOM
 async function renderTasks() {
