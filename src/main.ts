@@ -7,14 +7,6 @@ let modal = document.querySelector('#my-modal')! as HTMLDivElement;
 let modalContent = document.querySelector('.modal-content')! as HTMLDivElement;
 let taskContainer = document.querySelector('.task-container')! as HTMLDivElement;
 
-modalContent.addEventListener("click", (e) => {
-    let target = e.target as HTMLElement;
-    if (target.className == "delete-btn") {
-        deleteTask(Number(target.id));
-    }
-})
-
-
 
 //  form template for adding a new task
 let formTemplate: string = `
